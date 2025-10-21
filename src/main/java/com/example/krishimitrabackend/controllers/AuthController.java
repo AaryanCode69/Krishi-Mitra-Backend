@@ -16,8 +16,8 @@ public class AuthController {
 
     @PostMapping("/getOtp/{number}")
     public ResponseEntity<String> getOtp(@PathVariable("number") String number){
-        String message = authService.sendOtp(number);
-        return ResponseEntity.ok(message);
+        authService.sendOtp(number);
+        return ResponseEntity.ok("Otp Sent Successfully");
     }
 
     @PostMapping("/verifyOtp")

@@ -21,20 +21,23 @@ public class UserEntity {
     private UUID id;
 
     @Column(unique = true,nullable = false)
-    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid Indian mobile number format. Must be 10 digits and start with 6, 7, 8, or 9.")
+    @Pattern(regexp = "^(\\+91)?[6-9]\\d{9}$", message = "Invalid Indian mobile number format. Must be 10 digits and start with 6, 7, 8, or 9.")
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String fullName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String city;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String state;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String district;
+
+    @Column(nullable = false)
+    private boolean profileComplete = false;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
