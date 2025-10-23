@@ -19,4 +19,9 @@ public class GlobalExceptionHandler{
     public ResponseEntity<String> EntityNotFoundExceptionHandler(EntityNotFoundException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<String> RateLimitExceptionHandler(RateLimitException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.TOO_MANY_REQUESTS);
+    }
 }

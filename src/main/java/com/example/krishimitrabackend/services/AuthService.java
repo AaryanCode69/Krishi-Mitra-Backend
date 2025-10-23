@@ -1,7 +1,10 @@
 package com.example.krishimitrabackend.services;
 
 import com.example.krishimitrabackend.entities.UserEntity;
+import com.example.krishimitrabackend.exception.RateLimitException;
 import com.example.krishimitrabackend.repository.UserRepository;
+import io.github.bucket4j.Bucket;
+import io.github.bucket4j.ConsumptionProbe;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class AuthService {
 
+   private final RateLimitingService rateLimitingService;
    private final UserRepository userRepository;
    private final RedisTemplate<String, String> redisTemplate;
    private final SmsService smsService;
@@ -28,7 +32,16 @@ public class AuthService {
    private long otpExpirationMinutes;
 
    public void sendOtp(String phoneNumber) {
-       log.info("Sending OTP to "+phoneNumber);
+       log.info("Attempting to Sending OTP to "+phoneNumber);
+       Bucket otpBucket = rateLimitingService.bucketForOTp(phoneNumber);
+       ConsumptionProbe probe = otpBucket.tryConsumeAndReturnRemaining(1);
+
+       if(!probe.isConsumed()) {
+           long waitForRefillSeconds = probe.getNanosToWaitForRefill() / 1_000_000_000;
+           log.warn("Ratelimit exceeded for {} please wait for {} seconds", phoneNumber, waitForRefillSeconds+1);
+           throw new RateLimitException("Ratelimit exceeded for please wait for " + (waitForRefillSeconds+1) + " seconds");
+       }
+       log.info("Requested is not RateLimited :- Sending OTP to "+phoneNumber);
        String otp = String.valueOf(100000 + random.nextInt(900000));
        String redisKey = OTP_PREFIX + phoneNumber;
        try{
