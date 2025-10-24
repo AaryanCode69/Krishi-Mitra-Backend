@@ -3,7 +3,6 @@ package com.example.krishimitrabackend.filters;
 import com.example.krishimitrabackend.entities.UserEntity;
 import com.example.krishimitrabackend.services.JwtService;
 import com.example.krishimitrabackend.services.UserService;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +27,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserService userService;
 
     @Autowired
-    @Qualifier("exceptionResolver")
+    @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver exceptionResolver;
 
     @Override
@@ -43,11 +42,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, null);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-                filterChain.doFilter(request, response);
-            } else {
-                filterChain.doFilter(request, response);
-
             }
+            filterChain.doFilter(request, response);
         }catch (Exception e) {
             exceptionResolver.resolveException(request, response, null, e);
         }

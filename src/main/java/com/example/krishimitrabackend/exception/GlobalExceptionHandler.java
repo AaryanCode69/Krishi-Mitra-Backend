@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 
 @RestControllerAdvice
@@ -35,5 +36,10 @@ public class GlobalExceptionHandler{
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<String> ExceptionHandler(JwtException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(S3Exception.class)
+    public ResponseEntity<String> ExceptionHandler(Exception exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
