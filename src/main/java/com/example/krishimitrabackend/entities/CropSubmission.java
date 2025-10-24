@@ -2,6 +2,7 @@ package com.example.krishimitrabackend.entities;
 
 import com.example.krishimitrabackend.entities.enums.Status;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Builder
 public class CropSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,8 +28,8 @@ public class CropSubmission {
     @Column(nullable = false)
     private String image_url;
 
-    @Column(nullable = false)
-    private double confidenceScore;
+    @Column
+    private Double confidenceScore;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -39,6 +41,7 @@ public class CropSubmission {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
