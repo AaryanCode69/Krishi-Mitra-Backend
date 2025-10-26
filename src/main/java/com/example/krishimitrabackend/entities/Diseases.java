@@ -16,4 +16,7 @@ public class Diseases {
     @Column(unique = true, nullable = false)
     private String scientificName;
 
+    @Column(columnDefinition = "TEXT")
+    private String recommendedActions;
+
 }

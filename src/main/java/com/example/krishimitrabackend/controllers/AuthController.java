@@ -1,5 +1,6 @@
 package com.example.krishimitrabackend.controllers;
 
+import com.example.krishimitrabackend.dtos.LoginResponseDTO;
 import com.example.krishimitrabackend.dtos.OtpVerificationDTO;
 import com.example.krishimitrabackend.services.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,15 @@ public class AuthController {
     }
 
     @PostMapping("/verifyOtp")
-    public ResponseEntity<String> verifyOtp(@RequestBody OtpVerificationDTO otpVerificationDTO){
-        String message = authService.verifyOtp(otpVerificationDTO.getPhoneNumber(),  otpVerificationDTO.getOtp());
-        return ResponseEntity.ok(message);
+    public ResponseEntity<LoginResponseDTO> verifyOtp(@RequestBody OtpVerificationDTO otpVerificationDTO){
+        LoginResponseDTO loginResponseDTO = authService.verifyOtp(otpVerificationDTO.getPhoneNumber(),  otpVerificationDTO.getOtp());
+        return ResponseEntity.ok(loginResponseDTO);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDTO> refreshAccessToken(@RequestParam String refreshToken){
+        LoginResponseDTO loginResponseDTO = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(loginResponseDTO);
     }
 
 }

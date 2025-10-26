@@ -1,14 +1,17 @@
 package com.example.krishimitrabackend.services;
 
 import com.example.krishimitrabackend.configs.RabbitMqConfig;
+import com.example.krishimitrabackend.dtos.CropSubmissionResponseDTO;
 import com.example.krishimitrabackend.dtos.RabbitMQDTO;
 import com.example.krishimitrabackend.entities.CropSubmission;
 import com.example.krishimitrabackend.entities.UserEntity;
 import com.example.krishimitrabackend.entities.enums.Status;
 import com.example.krishimitrabackend.repository.CropSubmissionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -16,6 +19,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 
 
 @Service
@@ -30,6 +34,8 @@ public class CropSubmissionService {
     private String region;
 
     private final CropSubmissionRepository cropSubmissionRepository;
+
+    private final ModelMapper modelMapper;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -59,5 +65,27 @@ public class CropSubmissionService {
         rabbitTemplate.convertAndSend(RabbitMqConfig.Exchange_Name,RabbitMqConfig.RoutingKey_Name,rabbitMQDTO);
 
         return rabbitMQDTO;
+    }
+
+    
+    public CropSubmissionResponseDTO getProcessedResponse(UUID submissionId) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || !authentication.isAuthenticated()) {
+            throw new AuthenticationException("User is not Authenticated"){};
+        }
+
+        CropSubmission cropSubmission = cropSubmissionRepository
+                .findById(submissionId)
+                .orElseThrow(()-> new EntityNotFoundException("Crop Submission Not Found"));
+        CropSubmissionResponseDTO cropSubmissionResponseDTO = modelMapper.map(cropSubmission, CropSubmissionResponseDTO.class);
+        if(cropSubmission.getDiseases()==null || cropSubmission.getDiseases().isEmpty()) {
+            cropSubmissionResponseDTO.setDiseaseName(null);
+            cropSubmissionResponseDTO.setRemedy(null);
+        }else{
+         cropSubmissionResponseDTO.setRemedy(cropSubmission.getDiseases().get(0).getRecommendedActions());
+         cropSubmissionResponseDTO.setDiseaseName(cropSubmission.getDiseases().get(0).getScientificName());
+        }
+        return cropSubmissionResponseDTO;
     }
 }

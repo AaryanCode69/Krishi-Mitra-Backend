@@ -2,9 +2,7 @@ package com.example.krishimitrabackend.entities;
 
 import com.example.krishimitrabackend.entities.enums.Status;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +14,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CropSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

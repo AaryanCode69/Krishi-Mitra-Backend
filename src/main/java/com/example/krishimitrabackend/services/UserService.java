@@ -30,6 +30,7 @@ public class UserService {
         UserEntity currentUser = (UserEntity) authentication.getPrincipal();
         UserEntity usertoUpdate = getUserById(currentUser.getId());
         modelMapper.map(user, usertoUpdate);
+        usertoUpdate.setProfileComplete(true);
         usertoUpdate = userRepository.save(usertoUpdate);
 
         return modelMapper.map(usertoUpdate, UserRegisterationDTO.class);

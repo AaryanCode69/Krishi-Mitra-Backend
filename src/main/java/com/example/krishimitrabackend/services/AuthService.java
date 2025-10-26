@@ -1,10 +1,12 @@
 package com.example.krishimitrabackend.services;
 
+import com.example.krishimitrabackend.dtos.LoginResponseDTO;
 import com.example.krishimitrabackend.entities.UserEntity;
 import com.example.krishimitrabackend.exception.RateLimitException;
 import com.example.krishimitrabackend.repository.UserRepository;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -56,7 +59,7 @@ public class AuthService {
    }
 
    @Transactional
-   public String verifyOtp(String phoneNumber, String otp) {
+   public LoginResponseDTO verifyOtp(String phoneNumber, String otp) {
        log.info("Verifying OTP to "+phoneNumber);
        String redisKey = OTP_PREFIX + phoneNumber;
        String storedOtp = redisTemplate.opsForValue().getAndDelete(redisKey);
@@ -74,9 +77,24 @@ public class AuthService {
            user = new UserEntity();
            user.setPhoneNumber(phoneNumber);
            user.setProfileComplete(false);
-           userRepository.save(user);
+           user = userRepository.save(user);
        }
        log.info("OTP verified successfully for {}",phoneNumber);
-       return jwtService.generateToken(user);
+       LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
+               .userId(user.getId())
+               .accessToken(jwtService.generateAccessToken(user))
+               .refreshToken(jwtService.generateRefreshToken(user))
+               .build();
+       return loginResponseDTO;
+   }
+
+   public LoginResponseDTO refreshToken(String refreshToken) {
+       UUID userId = jwtService.getUserIdFromToken(refreshToken);
+       UserEntity user = userRepository.findById(userId).orElse((null));
+       if(user==null){
+           throw new EntityNotFoundException("User not found ,not a valid token");
+       }
+       String accessToken = jwtService.generateAccessToken(user);
+       return  LoginResponseDTO.builder().userId(user.getId()).refreshToken(refreshToken).accessToken(accessToken).build();
    }
 }
