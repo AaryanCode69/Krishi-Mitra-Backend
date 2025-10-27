@@ -79,6 +79,7 @@ public class CropSubmissionService {
                 .findById(submissionId)
                 .orElseThrow(()-> new EntityNotFoundException("Crop Submission Not Found"));
         CropSubmissionResponseDTO cropSubmissionResponseDTO = modelMapper.map(cropSubmission, CropSubmissionResponseDTO.class);
+        cropSubmissionResponseDTO.setImageUrl(cropSubmission.getImage_url());
         if(cropSubmission.getDiseases()==null || cropSubmission.getDiseases().isEmpty()) {
             cropSubmissionResponseDTO.setDiseaseName(null);
             cropSubmissionResponseDTO.setRemedy(null);

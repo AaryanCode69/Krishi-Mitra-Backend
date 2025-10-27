@@ -1,15 +1,15 @@
 package com.example.krishimitrabackend.dtos;
 
 import com.example.krishimitrabackend.entities.enums.Status;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CropSubmissionResponseDTO {
     private UUID submissionId;
     private String diseaseName;
