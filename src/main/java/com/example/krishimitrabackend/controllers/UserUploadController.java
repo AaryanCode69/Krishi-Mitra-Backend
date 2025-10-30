@@ -36,7 +36,7 @@ public class UserUploadController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/proccessed/{submissionId}")
+    @GetMapping("/processed/{submissionId}")
     public ResponseEntity<CropSubmissionResponseDTO> proccessed(@PathVariable UUID submissionId) {
         log.info("Request received for user proccessed upload");
         CropSubmissionResponseDTO cropSubmissionResponseDTO = cropSubmissionService.getProcessedResponse(submissionId);

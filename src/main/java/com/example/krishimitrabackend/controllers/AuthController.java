@@ -15,10 +15,10 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/getOtp/{number}")
+    @GetMapping("/getOtp/{number}")
     public ResponseEntity<String> getOtp(@PathVariable("number") String number){
-        authService.sendOtp(number);
-        return ResponseEntity.ok("Otp Sent Successfully");
+        String message = authService.sendOtp(number);
+        return ResponseEntity.ok(message);
     }
 
     @PostMapping("/verifyOtp")

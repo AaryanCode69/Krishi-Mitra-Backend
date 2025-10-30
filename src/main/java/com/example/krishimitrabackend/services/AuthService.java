@@ -4,6 +4,7 @@ import com.example.krishimitrabackend.dtos.LoginResponseDTO;
 import com.example.krishimitrabackend.entities.UserEntity;
 import com.example.krishimitrabackend.exception.RateLimitException;
 import com.example.krishimitrabackend.repository.UserRepository;
+import com.twilio.exception.ApiException;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,7 +35,7 @@ public class AuthService {
    @Value("${app.otp.expiry-minutes}")
    private long otpExpirationMinutes;
 
-   public void sendOtp(String phoneNumber) {
+   public String sendOtp(String phoneNumber) {
        log.info("Attempting to Sending OTP to "+phoneNumber);
        Bucket otpBucket = rateLimitingService.bucketForOTp(phoneNumber);
        ConsumptionProbe probe = otpBucket.tryConsumeAndReturnRemaining(1);
@@ -51,7 +52,13 @@ public class AuthService {
            redisTemplate.opsForValue().set(redisKey, otp, otpExpirationMinutes, TimeUnit.MINUTES);
            smsService.sendSms(phoneNumber, otp);
            log.info("OTP sent to "+phoneNumber);
-       }catch (Exception e){
+           return "Message sent Successfully";
+       }catch (ApiException e) {
+           log.error("Twilio API Error sending OTP to {}: Code={} Message={}", phoneNumber, e.getCode(), e.getMessage());
+           redisTemplate.delete(redisKey);
+           throw e;
+       }
+       catch (Exception e){
            log.error("Error sending OTP to {} : {}  ",phoneNumber, e.getMessage());
            redisTemplate.delete(redisKey);
            throw new RuntimeException("Error sending OTP to " + phoneNumber);

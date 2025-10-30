@@ -1,5 +1,6 @@
 package com.example.krishimitrabackend.exception;
 
+import com.twilio.exception.ApiException;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.amqp.AmqpException;
@@ -48,4 +49,10 @@ public class GlobalExceptionHandler{
     public ResponseEntity<String> AmqpExceptionHandler(AmqpException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<String> ApiExceptionHandler(ApiException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
