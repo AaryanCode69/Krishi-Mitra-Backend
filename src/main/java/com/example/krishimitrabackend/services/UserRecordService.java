@@ -43,20 +43,8 @@ public class UserRecordService {
     private CropSubmissionDTO mapEntityToSummaryDTO(CropSubmission submission) {
 
         CropSubmissionDTO dto = modelMapper.map(submission, CropSubmissionDTO.class);
-
-
-        if (submission.getStatus() == Status.Completed) {
-            List<Diseases> diseasesList = submission.getDiseases();
-            if (diseasesList == null || diseasesList.isEmpty()) {
-                dto.setDiseaseName("Healthy");
-            } else {
-                dto.setDiseaseName(diseasesList.get(0).getScientificName());
-            }
-        } else if (submission.getStatus() == Status.Processing) {
-            dto.setDiseaseName("Analysis in Progress...");
-        } else {
-            dto.setDiseaseName("Analysis Failed");
-        }
+        List<Diseases> diseasesList = submission.getDiseases();
+        dto.setDiseaseName(diseasesList.get(0).getScientificName());
         dto.setId(submission.getId());
         dto.setImageUrl(submission.getImage_url());
 

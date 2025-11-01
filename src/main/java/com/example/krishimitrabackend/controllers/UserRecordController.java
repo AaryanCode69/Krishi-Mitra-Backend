@@ -14,12 +14,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/getRecords")
+@RequestMapping("/api")
 public class UserRecordController {
     private final UserRecordService userRecordService;
 
 
-    @GetMapping("/allRecords")
+    @GetMapping("/submissions/history")
     private ResponseEntity<List<CropSubmissionDTO>> getAllCropSubmission(){
         log.info("Getting all crop submissions");
         List<CropSubmissionDTO> responseList  = userRecordService.getAllCrops();
