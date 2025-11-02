@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,8 +44,11 @@ public class MandiService {
                     .queryParam("filters[State]", state)
                     .queryParam("limit", 10)
                     .toUriString();
+
+            System.out.println(url);
+
             try{
-                DataGovResponseDTO responseDTO = restTemplate.getForObject(url, DataGovResponseDTO.class);
+                DataGovResponseDTO responseDTO = restTemplate.getForObject(URI.create(url), DataGovResponseDTO.class);
                 if(responseDTO == null || responseDTO.getRecords() ==null || responseDTO.getRecords().isEmpty()){
                     log.info("No Commodity Available for this State");
                     return Collections.emptyList();
