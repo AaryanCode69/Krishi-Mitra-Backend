@@ -26,7 +26,7 @@ public class AuthService {
 
    private final RateLimitingService rateLimitingService;
    private final UserRepository userRepository;
-   private final RedisTemplate<String, String> redisTemplate;
+   private final RedisTemplate<String, Object> redisTemplate;
    private final SmsService smsService;
    private final JwtService jwtService;
    private static final String OTP_PREFIX = "otp:";
@@ -69,7 +69,7 @@ public class AuthService {
    public LoginResponseDTO verifyOtp(String phoneNumber, String otp) {
        log.info("Verifying OTP to "+phoneNumber);
        String redisKey = OTP_PREFIX + phoneNumber;
-       String storedOtp = redisTemplate.opsForValue().getAndDelete(redisKey);
+       String storedOtp = (String) redisTemplate.opsForValue().getAndDelete(redisKey);
        log.info("OTP is "+storedOtp);
        if(storedOtp==null){
            log.warn("OTP verification failed for {}: OTP expired or does not exist", phoneNumber);

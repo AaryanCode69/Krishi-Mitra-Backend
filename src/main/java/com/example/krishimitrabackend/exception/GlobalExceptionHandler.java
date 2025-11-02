@@ -4,6 +4,7 @@ import com.twilio.exception.ApiException;
 import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.amqp.AmqpException;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -47,6 +48,11 @@ public class GlobalExceptionHandler{
 
     @ExceptionHandler(AmqpException.class)
     public ResponseEntity<String> AmqpExceptionHandler(AmqpException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RedisSystemException.class)
+    public ResponseEntity<String> RedisSystemExceptionHandler(RedisSystemException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
